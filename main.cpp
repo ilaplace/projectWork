@@ -4,7 +4,15 @@
 #include <QTextStream>
 #include <QtDebug>
 #include <QProcess>
+#include <QFile>
+#include <QIODevice>
+#include <QTextStream>
+#include <QDebug>
+#include <QSerialPort>
+#include <QStringList>
+#include <QObject>
 
+#include "serialportreader.h"
 
 int main(int argc, char *argv[])
 {
@@ -13,9 +21,27 @@ int main(int argc, char *argv[])
     MainWindow w;
     w.show();
 
-    //qDebug() << file.exists();
+
+    const QString serialPortName = "/dev/ttyACM0";
+    const int serialPortBaudRate = QSerialPort::Baud9600;
+
+    QSerialPort serialPort;
+    serialPort.setBaudRate(serialPortBaudRate);
+    serialPort.setPortName(serialPortName);
+    QTextStream standardOutput(stdout);
+
+    if(!serialPort.open(QIODevice::ReadOnly)){
+        standardOutput << QObject::tr("Failed to open port %1, error: %2")
+                                 .arg(serialPortName)
+                                 .arg(serialPort.errorString())
+                              << endl;
+
+    }else{standardOutput<< QObject::tr("Port is open sire");}
+
+    SerialPortReader serialPortReader(&serialPort);
 
 
+        //qDebug() << file.exists();
         //To see the current position
         // auto pozisyon= in.pos();
 
@@ -25,10 +51,6 @@ int main(int argc, char *argv[])
 
         //QString str = in.readLine();
 
-
-
-
-
-
+    //w.QObject::dumpObjectTree();
     return a.exec();
 }
